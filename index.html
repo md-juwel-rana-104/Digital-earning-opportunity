@@ -1,782 +1,368 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Earning Opportunity - Final Assessment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Superstar Academy | Executive Assessment</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <style>
-        /* --- Fonts --- */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
-
-        /* --- Refined Neumorphic Theme --- */
         :root {
-            --primary-color: #8e44ad; /* Amethyst - Changed Color */
-            --primary-dark: #732d91; /* Changed Color */
-            --secondary-color: #2c3e50; /* Midnight Blue */
-
-            --correct-color: #27ae60;
-            --incorrect-color: #c0392b;
-
-            --bg-color: #eef0f4; /* Neumorphic Base */
-            --light-shadow: rgba(255, 255, 255, 0.9);
-            --dark-shadow: #c8cdd4;
-
-            --font-en: 'Montserrat', sans-serif;
-            --font-bn: 'Hind Siliguri', sans-serif;
+            --primary: #4f46e5;
+            --secondary: #818cf8;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --bg-gradient: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #1e293b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: var(--font-en);
-            background: var(--bg-color);
-            color: var(--secondary-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        body { 
+            background: var(--bg-gradient);
+            font-family: 'Outfit', 'Hind Siliguri', sans-serif;
             min-height: 100vh;
-            padding: 15px;
-            overflow-x: hidden;
-        }
-
-        body.lang-bn { font-family: var(--font-bn); }
-
-        /* --- Notification Bar --- */
-        .notification-bar {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--bg-color);
-            padding: 12px 25px; border-radius: 12px;
-            box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
-            color: var(--incorrect-color);
-            font-size: 1rem; font-weight: 600; z-index: 1000;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            max-width: 90%; text-align: center;
-        }
-        .notification-bar.show { top: 20px; }
-        .notification-bar.success { color: var(--correct-color); }
-
-        /* --- Main Container --- */
-        .quiz-container {
-            background-color: var(--bg-color);
-            width: 100%; max-width: 800px;
-            border-radius: 30px;
-            box-shadow: 15px 15px 30px var(--dark-shadow), -15px -15px 30px var(--light-shadow);
-            overflow: hidden; text-align: center;
-        }
-
-        .quiz-header { padding: 20px 25px; display: flex; justify-content: flex-end; }
-
-        /* --- Core Neumorphic Styles --- */
-        .neumorphic-outset {
-            border-radius: 15px;
-            background: var(--bg-color);
-            box-shadow: 5px 5px 10px var(--dark-shadow), -5px -5px 10px var(--light-shadow);
-            transition: all 0.2s ease-in-out;
-            border: none;
-        }
-        .neumorphic-inset {
-            border-radius: 15px;
-            background: var(--bg-color);
-            box-shadow: inset 5px 5px 10px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        }
-
-        .lang-switcher button {
-            padding: 10px 18px; cursor: pointer;
-            font-weight: 600; color: var(--secondary-color);
-        }
-        .lang-switcher button:hover { transform: translateY(-2px); }
-        .lang-switcher button.active {
-            color: var(--primary-color);
-            box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
-        }
-        .lang-switcher button:first-child { margin-right: 10px; }
-
-        .screen { padding: 25px; animation: fadeIn 0.7s ease; }
-        .screen.hidden { display: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 50%, 90% { transform: translateX(-6px); } 30%, 70% { transform: translateX(6px); } }
-        .invalid-field {
-            animation: shake 0.4s ease-in-out;
-            box-shadow: inset 3px 3px 6px #b55042, inset -3px -3px 6px #ff7a6c !important; /* Redish shadow for error */
-        }
-
-        /* --- Typography --- */
-        h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 20px; color: var(--primary-color); }
-        h2 { font-size: 1.3rem; margin-bottom: 25px; line-height: 1.6; color: var(--secondary-color); }
-        p { font-size: 1rem; margin-bottom: 20px; line-height: 1.7; color: #6c7a89; }
-
-        /* --- Forms & Inputs --- */
-        .input-group { margin-bottom: 25px; text-align: left; }
-        .input-group label { font-weight: 600; display: block; margin-bottom: 10px; font-size: 0.9rem; color: var(--secondary-color); padding-left: 5px; }
-        .input-group input[type="text"] {
-            width: 100%; padding: 15px;
-            border: none; font-size: 1rem; font-family: inherit;
-            color: var(--secondary-color); background-color: transparent;
-        }
-        .input-group input[type="text"]:focus {
-             outline: none;
-        }
-
-        /* --- Screenshot Upload --- */
-        .screenshot-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-        .screenshot-upload {
-            flex: 1;
-        }
-        .screenshot-upload .upload-label {
-            display: flex; align-items: center; justify-content: center;
-            padding: 15px; cursor: pointer; font-weight: 500; color: var(--secondary-color);
-            text-align: center;
-        }
-        .screenshot-upload .upload-label:hover {
-            color: var(--primary-color); transform: translateY(-2px);
-        }
-        .screenshot-upload input[type="file"] { display: none; }
-
-        .screenshot-upload .neumorphic-inset {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 150px;
-            padding: 5px;
+            color: var(--text-main);
+            overflow: hidden;
+            touch-action: none;
         }
 
-        .screenshot-preview {
-            width: 100%;
-            max-height: 140px;
-            object-fit: contain;
-            display: none;
-            border-radius: 10px;
-        }
-        .screenshot-preview.visible {
-            display: block;
+        #canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
         }
 
+        .shape {
+            position: absolute; border-radius: 50%; filter: blur(60px); z-index: 0; opacity: 0.4;
+            animation: move 20s infinite alternate;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--primary); top: -50px; left: -50px; }
+        .shape-2 { width: 250px; height: 250px; background: var(--secondary); bottom: -50px; right: -50px; animation-delay: -5s; }
+        @keyframes move { from { transform: translate(0,0); } to { transform: translate(50px, 100px); } }
 
-        /* --- Buttons --- */
-        .btn {
-            padding: 15px 30px; font-size: 1rem; font-weight: 700;
-            cursor: pointer; margin: 5px; text-transform: uppercase; letter-spacing: 1px;
-            color: var(--secondary-color);
+        #loader {
+            position: fixed; inset: 0; background: #fff; z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
-        .btn:hover { transform: translateY(-2px); }
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: inset 5px 5px 10px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        }
-        .btn.btn-primary {
-            color: #fff; background-color: var(--primary-color);
-            box-shadow: 5px 5px 10px var(--dark-shadow), -5px -5px 10px var(--light-shadow);
-        }
-        .btn.btn-primary:hover { background-color: var(--primary-dark); }
-        .btn.btn-primary:active {
-             box-shadow: inset 5px 5px 10px var(--primary-dark), inset -5px -5px 10px var(--primary-color);
-        }
-        .btn:disabled {
-            box-shadow: none; color: #aaa;
-            background-color: #d1d9e6;
-            cursor: not-allowed; transform: none;
-        }
-        .btn-full { width: 100%; margin-top: 20px; }
+        .loader-ring { width: 60px; height: 60px; border: 4px solid #f1f5f9; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- Quiz Screen --- */
-        .progress-bar { width: 100%; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
-        #progress-indicator { height: 100%; width: 0%; background: var(--primary-color); transition: width 0.5s ease; border-radius: 5px; }
-        #progress-text { font-weight: 600; color: var(--secondary-color); margin-bottom: 20px; font-size: 0.9rem; }
-
-        .navigation-container { display: flex; justify-content: space-between; margin-top: 20px; }
-
-        .options-list { list-style: none; text-align: left; }
-        .options-list li {
-            padding: 15px; margin-bottom: 15px; cursor: pointer;
-            position: relative; display: flex; align-items: center; justify-content: space-between;
-            font-size: 1rem; color: var(--secondary-color);
-        }
-        .options-list li.selected {
-             box-shadow: inset 5px 5px 10px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        }
-        .options-list li.correct {
-            font-weight: 600; color: var(--correct-color);
-        }
-        .options-list li.incorrect {
-            font-weight: 600; color: var(--incorrect-color);
-        }
-        .options-list.disabled li { pointer-events: none; }
-        .feedback-icon { font-size: 1.2rem; font-weight: bold; }
-
-        /* --- Review Screen --- */
-        .review-item { margin-bottom: 20px; border-bottom: 1px solid #d1d9e6; padding-bottom: 15px;}
-        #review-list { max-height: 400px; overflow-y: auto; text-align: left; padding-right: 10px; }
-        .review-item .options-list li { cursor: default; }
-        .review-item .options-list li.user-answer.incorrect {
-             color: var(--incorrect-color);
-             box-shadow: inset 5px 5px 10px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        }
-        .review-item .options-list li.correct-answer {
-             color: var(--correct-color);
+        .app-container {
+            width: 92%; max-width: 650px; z-index: 10; display: none;
+            perspective: 1000px;
         }
 
-        /* --- Score Circle --- */
-        .score-circle-container {
-            width: 180px; height: 180px;
-            margin: 20px auto;
-            position: relative;
-            border-radius: 50%;
-        }
-        .score-circle { position: relative; width: 100%; height: 100%; }
-        .score-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); position: absolute; top: 0; left: 0; }
-        .score-circle .score-path { fill: none; stroke-width: 18; stroke-linecap: round; }
-        .score-bg-path { stroke: var(--bg-color); }
-        .score-progress { stroke: var(--primary-color); transition: stroke-dashoffset 1.8s ease; }
-        .score-text {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 2.5rem; font-weight: 700; color: var(--primary-color);
+        .premium-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 35px; padding: 45px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative; overflow: hidden;
         }
 
-        /* --- Responsive Styles --- */
-        @media (min-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            h2 { font-size: 1.5rem; }
-            .screen { padding: 40px; }
-            .score-circle-container { width: 220px; height: 220px; }
-            .score-text { font-size: 3.2rem; }
+        .premium-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .header-section { text-align: center; margin-bottom: 30px; }
+        .official-badge {
+            background: rgba(79, 70, 229, 0.1); color: var(--primary);
+            padding: 6px 15px; border-radius: 50px; font-size: 11px;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+            display: inline-block; margin-bottom: 15px;
+        }
+        .main-title { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
+        
+        .mentor-card {
+            background: #fff; display: inline-flex; align-items: center; padding: 10px 20px;
+            border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 10px;
+        }
+        .mentor-details { text-align: left; margin-left: 12px; }
+        .mentor-details h4 { font-size: 0.95rem; color: var(--primary); font-weight: 800; }
+        .mentor-details p { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+
+        .lang-toggle { position: absolute; top: 25px; right: 25px; display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; }
+        .tgl-btn { padding: 6px 12px; border: none; background: none; font-size: 11px; font-weight: 800; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .tgl-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: 700; font-size: 0.9rem; }
+        .progress-track { height: 10px; background: #f1f5f9; border-radius: 50px; margin-bottom: 35px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        .question-box h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; line-height: 1.5; color: #0f172a; }
+        
+        .opt-item {
+            background: white; border: 2px solid #f1f5f9; padding: 20px;
+            border-radius: 20px; margin-bottom: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600;
+        }
+        .opt-item:hover:not(.locked) { transform: scale(1.02); border-color: var(--primary); background: #f5f7ff; }
+        .opt-item.correct { background: #ecfdf5 !important; border-color: var(--success) !important; color: #065f46; }
+        .opt-item.wrong { background: #fff1f2 !important; border-color: var(--danger) !important; color: #9f1239; }
+        
+        .opt-icon { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .correct .opt-icon { background: var(--success); border-color: var(--success); color: white; }
+        .wrong .opt-icon { background: var(--danger); border-color: var(--danger); color: white; }
+
+        .action-area { display: flex; gap: 15px; margin-top: 30px; }
+        .nav-btn {
+            flex: 1; padding: 20px; border-radius: 20px; border: none;
+            font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-next { background: var(--primary); color: white; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+        .btn-back { background: #f1f5f9; color: #64748b; }
+
+        .input-wrap { text-align: left; margin-bottom: 25px; }
+        .input-wrap label { display: block; font-weight: 700; color: #475569; margin-bottom: 10px; font-size: 0.9rem; }
+        .input-wrap input { 
+            width: 100%; padding: 18px; border-radius: 18px; border: 2px solid #e2e8f0;
+            background: #f8fafc; font-size: 1rem; transition: 0.3s;
+        }
+
+        /* লাল কালারের জন্য নতুন ক্লাস */
+        .input-error {
+            border-color: var(--danger) !important;
+            background: #fff1f2 !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score-display {
+            width: 150px; height: 150px; border-radius: 50%; border: 8px solid var(--primary);
+            margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 900; color: var(--primary); background: #f5f7ff;
         }
     </style>
 </head>
 <body>
 
-<div class="notification-bar" id="notification-bar"></div>
+    <audio id="sound-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3"></audio>
 
-<div class="quiz-container">
-    <div class="quiz-header">
-        <div class="lang-switcher">
-            <button id="lang-en" class="active neumorphic-outset">English</button>
-            <button id="lang-bn" class="neumorphic-outset">বাংলা</button>
-        </div>
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <canvas id="canvas"></canvas>
+
+    <div id="loader">
+        <div class="loader-ring"></div>
+        <p style="margin-top: 20px; font-weight: 800; letter-spacing: 2px; color: var(--primary);">AUTHENTICATING...</p>
     </div>
 
-    <div class="screen" id="welcome-screen">
-        <h1 id="welcome-title"></h1>
-        <div class="input-group">
-            <label for="userName" id="name-label"></label>
-            <div class="neumorphic-inset">
-                <input type="text" id="userName" required>
+    <div class="app-container" id="app">
+        <div class="premium-card">
+            
+            <div class="lang-toggle">
+                <button class="tgl-btn active" id="btn-en" onclick="changeLang('en')">EN</button>
+                <button class="tgl-btn" id="btn-bn" onclick="changeLang('bn')">বাংলা</button>
             </div>
-        </div>
-        <div class="input-group">
-            <label for="mentorName" id="mentor-label"></label>
-            <div class="neumorphic-inset">
-                <input type="text" id="mentorName" required>
-            </div>
-        </div>
-        <div class="screenshot-container">
-            <div class="screenshot-upload">
-                <p class="upload-title" id="upload-title-1"></p>
-                <label class="upload-label neumorphic-outset" for="ss-upload-1" id="upload-label-1"></label>
-                <input type="file" id="ss-upload-1" accept="image/*">
-                <div class="neumorphic-inset">
-                    <img id="ss-preview-1" class="screenshot-preview">
+
+            <div class="header-section">
+                <div class="official-badge">Verified Assessment</div>
+                <h1 class="main-title">Superstar Academy</h1>
+                <div class="mentor-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1995/1995539.png" width="35" alt="Mentor">
+                    <div class="mentor-details">
+                        <h4>Juwel Rana Sir</h4>
+                        <p>Corporate Trainer • Co-Founder • Manager</p>
+                    </div>
                 </div>
             </div>
-            <div class="screenshot-upload">
-                <p class="upload-title" id="upload-title-2"></p>
-                <label class="upload-label neumorphic-outset" for="ss-upload-2" id="upload-label-2"></label>
-                <input type="file" id="ss-upload-2" accept="image/*">
-                <div class="neumorphic-inset">
-                    <img id="ss-preview-2" class="screenshot-preview">
+
+            <div id="screen-start">
+                <div class="input-wrap">
+                    <label id="lbl-u">Candidate Full Name</label>
+                    <input type="text" id="userName" placeholder="Enter your official name" oninput="this.classList.remove('input-error')">
+                </div>
+                <div class="input-wrap">
+                    <label id="lbl-m">Assigned Mentor Name</label>
+                    <input type="text" id="mentorName" placeholder="Enter mentor name" oninput="this.classList.remove('input-error')">
+                </div>
+                <button class="nav-btn btn-next" style="width: 100%;" onclick="initQuiz()">
+                    Access Assessment <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div id="screen-quiz" style="display: none;">
+                <div class="progress-meta">
+                    <span id="q-count">Question 1/10</span>
+                    <span id="q-percent">0%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" id="p-bar"></div></div>
+                <div class="question-box" id="q-area"></div>
+                <div class="action-area">
+                    <button class="nav-btn btn-back" id="backBtn" onclick="prevQ()">Back</button>
+                    <button class="nav-btn btn-next" id="nextBtn" onclick="nextQ()">Next</button>
                 </div>
             </div>
-        </div>
-        <button class="btn btn-primary btn-full neumorphic-outset" id="start-btn"></button>
-    </div>
 
-    <div class="screen hidden" id="quiz-screen">
-        <div id="progress-text"></div>
-        <div class="progress-bar neumorphic-inset"><div id="progress-indicator"></div></div>
-        <div id="q-animation-wrapper">
-            <h2 id="question-text"></h2>
-            <div id="options-container"></div>
-        </div>
-        <div class="navigation-container" id="navigation-btns">
-            <button class="btn neumorphic-outset" id="prev-btn"></button>
-            <button class="btn btn-primary neumorphic-outset" id="next-btn"></button>
-        </div>
-    </div>
-
-    <div class="screen hidden" id="results-screen">
-        <h1 id="result-heading"></h1>
-        <div class="score-circle-container neumorphic-inset">
-            <div class="score-circle">
-                <svg viewBox="0 0 200 200">
-                    <circle class="score-path score-bg-path" cx="100" cy="100" r="90"></circle>
-                    <circle class="score-path score-progress" id="score-progress" cx="100" cy="100" r="90"></circle>
-                </svg>
+            <div id="screen-result" style="display: none; text-align: center;">
+                <div class="score-display" id="final-p">0%</div>
+                <h2 id="final-h" style="font-size: 1.8rem; margin-bottom: 10px;">Excellent Performance!</h2>
+                <p id="final-sub" style="color: #64748b; margin-bottom: 30px; font-weight: 600;">Your results have been securely synced.</p>
+                <div id="sync-status" style="margin-bottom: 20px; font-size: 12px; font-weight: 800; color: var(--success);"></div>
+                <a href="https://www.facebook.com" class="nav-btn btn-next" style="text-decoration: none;">
+                    <i class="fab fa-facebook-messenger"></i> Back to Mentor
+                </a>
             </div>
-            <div class="score-text" id="score-percentage">0%</div>
-        </div>
-        <p id="score-details"></p>
-        <div class="results-buttons">
-            <button class="btn btn-primary neumorphic-outset" id="review-btn"></button>
-            <button class="btn neumorphic-outset" id="restart-btn"></button>
-        </div>
-    </div>
 
-    <div class="screen hidden" id="review-screen">
-        <h1 id="review-title"></h1>
-        <div id="review-list"></div>
-        <button class="btn btn-primary neumorphic-outset" id="back-to-results-btn"></button>
+        </div>
     </div>
-</div>
 
 <script>
-    // --- UPDATED SCRIPT URL ---
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyheqwrmWYhb6VgJnG0hvn7K6FDoND-SJDyhTmnq2TXn2wXhH44gb943iLfjXCjchG90Q/exec";
+    const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    let particles = [];
+    const colors = ['#4f46e5', '#818cf8', '#10b981', '#f43f5e'];
 
-    // --- UPDATED UI STRINGS AND GRADING ---
-    const uiStrings = {
-        en: {
-            welcomeTitle: "Digital Earning Opportunity",
-            nameLabel: "Your Name",
-            mentorLabel: "Mentor's Name",
-            namePlaceholder: "Enter your full name...",
-            mentorPlaceholder: "Enter mentor's name (e.g., John Doe Sir)",
-            uploadTitle1: "Start of Class",
-            uploadTitle2: "End of Class",
-            uploadLabel: "Click to Upload Screenshot",
-            uploadSuccess: "Uploaded! Replace?",
-            startBtn: "Start Quiz",
-            progressText: (c, t) => `Question ${c} of ${t}`,
-            prevBtn: "Previous",
-            nextBtn: "Next",
-            resultsBtn: "Finish & See Results",
-            getResultHeading: (percentage, name) => {
-                if (percentage >= 95) return `Excellent, ${name}! (A+)`;
-                if (percentage >= 90) return `Great Job, ${name}! (A)`;
-                if (percentage >= 85) return `Very Good, ${name}! (A-)`;
-                if (percentage >= 75) return `Good Effort, ${name}! (B)`;
-                if (percentage >= 65) return `Satisfactory, ${name}. (C)`;
-                if (percentage >= 55) return `You've Passed, ${name}. (D)`;
-                return `Needs Improvement, ${name}. (F)`;
-            },
-            scoreDetails: (s, t) => `You scored ${s} out of ${t}.`,
-            restartBtn: "Take Quiz Again",
-            reviewBtn: "Review Answers",
-            reviewTitle: "Answer Review",
-            backToResultsBtn: "Back to Results",
-            notifyName: "Please enter your name.",
-            notifyMentor: "Please enter mentor's name correctly (with Sir/Mam).",
-            notifySS1: "Please upload the start of class screenshot.",
-            notifySS2: "Please upload the end of class screenshot.",
-            notifyDuplicateSS: "Please upload two different screenshots.",
-            submissionInProgress: "Submitting...",
-            submissionSuccess: "Submission Successful!",
-            submissionError: "Submission Failed! Please try again."
-        },
-        bn: {
-            welcomeTitle: "ডিজিটাল আর্নিং অপরচুনিটি",
-            nameLabel: "আপনার নাম",
-            mentorLabel: "মেন্টরের নাম",
-            namePlaceholder: "আপনার সম্পূর্ণ নাম লিখুন...",
-            mentorPlaceholder: "মেন্টরের নাম লিখুন (যেমন, জন ডো স্যার)",
-            uploadTitle1: "ক্লাসের শুরু",
-            uploadTitle2: "ক্লাসের শেষ",
-            uploadLabel: "স্ক্রিনশট আপলোড করুন",
-            uploadSuccess: "আপলোড হয়েছে! বদলাবেন?",
-            startBtn: "কুইজ শুরু করুন",
-            progressText: (c, t) => `প্রশ্ন ${t}-এর মধ্যে ${c}`,
-            prevBtn: "পূর্ববর্তী",
-            nextBtn: "পরবর্তী",
-            resultsBtn: "শেষ করুন ও ফলাফল দেখুন",
-            getResultHeading: (percentage, name) => {
-                if (percentage >= 95) return `অসাধারণ ফলাফল, ${name}! (A+)`;
-                if (percentage >= 90) return `চমৎকার করেছেন, ${name}! (A)`;
-                if (percentage >= 85) return `খুব ভালো করেছেন, ${name}! (A-)`;
-                if (percentage >= 75) return `ভালো চেষ্টা, ${name}! (B)`;
-                if (percentage >= 65) return `সন্তোষজনক, ${name}। (C)`;
-                if (percentage >= 55) return `আপনি পাস করেছেন, ${name}। (D)`;
-                return `আরও চেষ্টার প্রয়োজন, ${name}। (F)`;
-            },
-            scoreDetails: (s, t) => `আপনি ${t}টির মধ্যে ${s}টি সঠিক করেছেন।`,
-            restartBtn: "আবার কুইজ দিন",
-            reviewBtn: "উত্তর পর্যালোচনা করুন",
-            reviewTitle: "উত্তর পর্যালোচনা",
-            backToResultsBtn: "ফলাফলে ফিরে যান",
-            notifyName: "অনুগ্রহ করে আপনার নাম লিখুন।",
-            notifyMentor: "মেন্টরের নাম সঠিকভাবে লিখুন (স্যার/ম্যাম সহ)।",
-            notifySS1: "ক্লাসের শুরুর স্ক্রিনশট আপলোড করুন।",
-            notifySS2: "ক্লাসের শেষের স্ক্রিনশট আপলোড করুন।",
-            notifyDuplicateSS: "অনুগ্রহ করে দুটি ভিন্ন স্ক্রিনশট আপলোড করুন।",
-            submissionInProgress: "জমা দেওয়া হচ্ছে...",
-            submissionSuccess: "সফলভাবে জমা দেওয়া হয়েছে!",
-            submissionError: "জমা দিতে ব্যর্থ! আবার চেষ্টা করুন."
+    class Particle {
+        constructor(x, y) {
+            this.x = x; this.y = y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = (Math.random() * 4) - 2;
+            this.speedY = (Math.random() * 4) - 2;
+            this.alpha = 1;
         }
-    };
+        update() { this.x += this.speedX; this.y += this.speedY; this.alpha -= 0.015; }
+        draw() { ctx.globalAlpha = this.alpha; ctx.fillStyle = colors[0]; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, 7); ctx.fill(); }
+    }
 
-    // --- UPDATED QUIZ DATA ---
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => { p.update(); p.draw(); if(p.alpha <= 0) particles.splice(i, 1); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+    window.addEventListener('mousedown', (e) => { for(let i=0; i<10; i++) particles.push(new Particle(e.clientX, e.clientY)); });
+
+    let lang = 'en', current = 0, answers = Array(10).fill(null);
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxpxAejkEamwEd8nPSO1c7uuFz-qDSvu3pmXoSP3wodLpKxfgUR9x07kc7tz4dGcJRww/exec";
+
     const quizData = [
-        { type: 'mcq', question: { en: 'Which stage is called "The Golden Period of Life?"', bn: 'জীবনের কোন পর্যায়কে "সোনালী সময়" বলা হয়?' }, options: { en: ['Childhood (0-12 age)', 'Teenage (13-20 age)', 'Youth (21-40 age)', 'Old Age (41+ age)'], bn: ['শৈশব (০-১২ বছর)', 'কৈশোর (১৩-২০ বছর)', 'যৌবন (২১-৪০ বছর)', 'বার্ধক্য (৪১+ বছর)'] }, answerKey: 'Youth (21-40 age)' },
-        { type: 'mcq', question: { en: 'Suppose, you want to buy a bike to make your journey more easier, this is your -', bn: 'ধরুন, আপনার যাতায়াত সহজ করার জন্য আপনি একটি বাইক কিনতে চান, এটি আপনার -' }, options: { en: ['Need', 'Want', 'Dream'], bn: ['প্রয়োজন', 'চাহিদা', 'স্বপ্ন'] }, answerKey: 'Want' },
-        { type: 'mcq', question: { en: 'If you have a group of people who works for you, then you are earning by doing -', bn: 'আপনার জন্য যদি একদল লোক কাজ করে, তাহলে আপনি কীসের মাধ্যমে উপার্জন করছেন?' }, options: { en: ['Time Trades', 'Time Leverage'], bn: ['সময়ের ব্যবসা', 'সময়ের লিভারেজ'] }, answerKey: 'Time Leverage' },
-        { type: 'mcq', question: { en: 'Time Leverage related with -', bn: 'সময়ের লিভারেজ কিসের সাথে সম্পর্কিত?' }, options: { en: ['Active Income', 'Passive Income'], bn: ['সক্রিয় আয়', 'নিষ্ক্রিয় আয়'] }, answerKey: 'Passive Income' },
-        { type: 'mcq', question: { en: "What is The 21st Century's Business Model called?", bn: 'একবিংশ শতাব্দীর ব্যবসায়িক মডেলকে কী বলা হয়?' }, options: { en: ['Traditional Business', 'Freelancing', 'Network Marketing', 'Brick and Mortar'], bn: ['প্রচলিত ব্যবসা', 'ফ্রিল্যান্সিং', 'নেটওয়ার্ক মার্কেটিং', 'ব্রিক অ্যান্ড মর্টার'] }, answerKey: 'Network Marketing' },
-        { type: 'mcq', question: { en: 'Business owners -', bn: 'ব্যবসার মালিকরা -' }, options: { en: ['Run After a Fixed Income', 'Create Network and Own a System'], bn: ['নির্দিষ্ট আয়ের পেছনে ছোটেন', 'নেটওয়ার্ক তৈরি করেন এবং একটি সিস্টেমের মালিক হন'] }, answerKey: 'Create Network and Own a System' },
-        { type: 'mcq', question: { en: 'What is the main mission of THE DREAMERS ACADEMY?', bn: 'THE DREAMERS ACADEMY-এর প্রধান লক্ষ্য কী?' }, options: { en: ['To sell products', 'To help people get jobs', 'To build entrepreneurs and leaders', 'To offer academic courses'], bn: ['পণ্য বিক্রি করা', 'চাকরি পেতে সাহায্য করা', 'উদ্যোক্তা এবং নেতা তৈরি করা', 'একাডেমিক কোর্স অফার করা'] }, answerKey: 'To build entrepreneurs and leaders' },
-        { type: 'mcq', question: { en: '"Shutter off, income off" is related to -', bn: '"শাটার বন্ধ, আয় বন্ধ" - এটি কার সাথে সম্পর্কিত?' }, options: { en: ['Employee', 'Business Owner', 'Self-Employed', 'Investor'], bn: ['কর্মচারী', 'ব্যবসায়ী', 'আত্ম-কর্মসংস্থানকারী', 'বিনিয়োগকারী'] }, answerKey: 'Self-Employed' },
-        { type: 'mcq', question: { en: 'Why is Traditional Business a Complex Business Model?', bn: 'প্রচলিত ব্যবসা কেন একটি জটিল ব্যবসায়িক মডেল?' }, options: { en: ['Requires high capital and management', 'Offers quick passive income', 'No legal involvement', 'Easy to automate'], bn: ['উচ্চ পুঁজি এবং ব্যবস্থাপনার প্রয়োজন', 'দ্রুত প্যাসিভ আয়ের সুযোগ দেয়', 'কোনো আইনি জড়িত নেই', 'সহজে স্বয়ংক্রিয় করা যায়'] }, answerKey: 'Requires high capital and management' },
-        { type: 'mcq', question: { en: 'Network Marketing offers -', bn: 'নেটওয়ার্ক মার্কেটিং কী অফার করে?' }, options: { en: ['A ready-made business system', 'A complex system', 'Lots of management headache'], bn: ['একটি রেডিমেড ব্যবসায়িক সিস্টেম', 'একটি জটিল সিস্টেম', 'প্রচুর ব্যবস্থাপনার মাথাব্যথা'] }, answerKey: 'A ready-made business system' }
+        { en: { q: "Which stage is called 'The Golden period of life'?", opts: ["Childhood", "Youth (21-40)", "Old Age"] }, bn: { q: "কোনটি জীবনের সুবর্ণ সময়?", opts: ["শৈশব", "যৌবন (২১-৪০)", "বার্ধক্য"] }, ans: 1 },
+        { en: { q: "Suppose, You want to buy a bike to make your journey easier, this is your -", opts: ["Need", "Want", "Dream"] }, bn: { q: "ভ্রমণ সহজ করতে আপনি একটি বাইক কিনতে চান, এটি আপনার -", opts: ["প্রয়োজন", "চাহিদা", "স্বপ্ন"] }, ans: 1 },
+        { en: { q: "If You have a group of people working for you, you are earning by -", opts: ["Time Trades", "Time Leverage"] }, bn: { q: "যদি আপনার জন্য একদল লোক কাজ করে, তবে আপনি আয় করছেন -", opts: ["টাইম ট্রেড করে", "টাইম লেভারেজ করে"] }, ans: 1 },
+        { en: { q: "Time Leverage is related with -", opts: ["Active Income", "Passive Income"] }, bn: { q: "টাইম লেভারেজ কিসের সাথে যুক্ত?", opts: ["সক্রিয় আয়", "প্যাসিভ আয়"] }, ans: 1 },
+        { en: { q: "What is the 21st century's business model called?", opts: ["Job Model", "Traditional Model", "Network Marketing"] }, bn: { q: "একুশ শতকের ব্যবসার মডেলকে কি বলা হয়?", opts: ["চাকরি মডেল", "ঐতিহ্যগত মডেল", "নেটওয়ার্ক মার্কেটিং"] }, ans: 2 },
+        { en: { q: "Business owners -", opts: ["Run after a fixed income", "Create network and own a system"] }, bn: { q: "ব্যবসায়িক মালিকরা মূলত -", opts: ["নির্দিষ্ট আয়ের পেছনে দৌড়ান", "নেটওয়ার্ক তৈরি করেন এবং সিস্টেমের মালিক হন"] }, ans: 1 },
+        { en: { q: "What is the main mission of THE SUPERSTAR ACADEMY?", opts: ["Skill Development", "Only Profit", "Selling Products"] }, bn: { q: "THE SUPERSTAR ACADEMY-এর মূল লক্ষ্য কী?", opts: ["দক্ষতা উন্নয়ন", "শুধু লাভ করা", "পণ্য বিক্রি করা"] }, ans: 0 },
+        { en: { q: "'Shutter off, income off': related to -", opts: ["Employee", "Business owner", "Self employed", "Investor"] }, bn: { q: "'শাটার বন্ধ, আয় বন্ধ': এটি কোনটির সাথে যুক্ত?", opts: ["চাকরিজীবী", "ব্যবসায়িক মালিক", "স্ব-নিযুক্ত (Self-employed)", "বিনিয়োগকারী"] }, ans: 2 },
+        { en: { q: "Why Traditional business is a complex business model?", opts: ["High Investment & Risk", "Easy Management", "No Competition"] }, bn: { q: "ঐতিহ্যগত ব্যবসা কেন একটি জটিল মডেল?", opts: ["উচ্চ বিনিয়োগ এবং ঝুঁকি", "সহজ ব্যবস্থাপনা", "কোন প্রতিযোগিতা নেই"] }, ans: 0 },
+        { en: { q: "Network Marketing offers -", opts: ["A ready made business system", "A complex system", "Lots of management headache"] }, bn: { q: "নেটওয়ার্ক মার্কেটিং অফার করে -", opts: ["একটি তৈরি ব্যবসায়িক সিস্টেম", "একটি জটিল সিস্টেম", "প্রচুর ম্যানেজমেন্টের ঝামেলা"] }, ans: 0 }
     ];
 
-    let currentLanguage = 'en';
-    let currentQuestionIndex = 0;
-    let userAnswers = new Array(quizData.length).fill(null);
-    let userName = '', mentorName = '';
-    let screenshotFile1 = null, screenshotFile2 = null;
-    let screenshotBase64_1 = null, screenshotBase64_2 = null;
+    window.onload = () => { setTimeout(() => { document.getElementById('loader').style.display='none'; document.getElementById('app').style.display='block'; }, 1500); };
 
-    const body = document.body;
-    const screens = { welcome: document.getElementById('welcome-screen'), quiz: document.getElementById('quiz-screen'), results: document.getElementById('results-screen'), review: document.getElementById('review-screen') };
-    const notificationBar = document.getElementById('notification-bar');
-    const langEnBtn = document.getElementById('lang-en'), langBnBtn = document.getElementById('lang-bn');
-    const startBtn = document.getElementById('start-btn'), prevBtn = document.getElementById('prev-btn'), nextBtn = document.getElementById('next-btn');
-    const restartBtn = document.getElementById('restart-btn'), reviewBtn = document.getElementById('review-btn'), backToResultsBtn = document.getElementById('back-to-results-btn');
-    const userNameInput = document.getElementById('userName'), mentorNameInput = document.getElementById('mentorName');
-
-    setLanguage('en');
-
-    langEnBtn.addEventListener('click', () => setLanguage('en'));
-    langBnBtn.addEventListener('click', () => setLanguage('bn'));
-    startBtn.addEventListener('click', startQuiz);
-    prevBtn.addEventListener('click', handlePrevButton);
-    nextBtn.addEventListener('click', handleNextButton);
-    restartBtn.addEventListener('click', restartQuiz);
-    reviewBtn.addEventListener('click', () => switchScreen('review'));
-    backToResultsBtn.addEventListener('click', () => switchScreen('results'));
-    document.getElementById('ss-upload-1').addEventListener('change', (e) => handleFileUpload(e, 1));
-    document.getElementById('ss-upload-2').addEventListener('change', (e) => handleFileUpload(e, 2));
-
-    function setLanguage(lang) {
-        currentLanguage = lang;
-        body.classList.toggle('lang-bn', lang === 'bn');
-        langEnBtn.classList.toggle('active', lang === 'en');
-        langBnBtn.classList.toggle('active', lang === 'bn');
-        updateAllUIText();
+    function changeLang(l) {
+        lang = l;
+        document.querySelectorAll('.tgl-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+l).classList.add('active');
+        if(document.getElementById('screen-quiz').style.display === 'block') renderQ();
     }
 
-    function updateAllUIText() {
-        const t = uiStrings[currentLanguage];
-        document.title = `${t.welcomeTitle} - Final Assessment`;
-        document.getElementById('welcome-title').innerText = t.welcomeTitle;
-        document.getElementById('name-label').innerText = t.nameLabel;
-        document.getElementById('mentor-label').innerText = t.mentorLabel;
-        userNameInput.placeholder = t.namePlaceholder;
-        mentorNameInput.placeholder = t.mentorPlaceholder;
-        document.getElementById('upload-label-1').innerText = screenshotFile1 ? t.uploadSuccess : t.uploadLabel;
-        document.getElementById('upload-label-2').innerText = screenshotFile2 ? t.uploadSuccess : t.uploadLabel;
-        document.getElementById('upload-title-1').innerText = t.uploadTitle1;
-        document.getElementById('upload-title-2').innerText = t.uploadTitle2;
-        startBtn.innerText = t.startBtn;
-        prevBtn.innerText = t.prevBtn;
-        restartBtn.innerText = t.restartBtn;
-        reviewBtn.innerText = t.reviewBtn;
-        document.getElementById('review-title').innerText = t.reviewTitle;
-        backToResultsBtn.innerText = t.backToResultsBtn;
+    function initQuiz() {
+        const userInp = document.getElementById('userName');
+        const mentorInp = document.getElementById('mentorName');
+        let isValid = true;
 
-        if (!screens.quiz.classList.contains('hidden')) showQuestion();
-        if (!screens.review.classList.contains('hidden')) buildReviewScreen();
-        if (!screens.results.classList.contains('hidden')) {
-            let score = 0;
-            const totalMcq = quizData.filter(q => q.type === 'mcq').length;
-            userAnswers.forEach((answer, index) => {
-                if (quizData[index].type === 'mcq' && answer === quizData[index].answerKey) score++;
-            });
-            const percentage = totalMcq > 0 ? Math.round((score / totalMcq) * 100) : 0;
-
-            document.getElementById('result-heading').innerText = t.getResultHeading(percentage, userName);
-            document.getElementById('score-details').innerText = t.scoreDetails(score, totalMcq);
+        if(!userInp.value.trim()) {
+            userInp.classList.add('input-error');
+            isValid = false;
         }
-    }
-
-    function showQuestion() {
-        const qWrapper = document.getElementById('q-animation-wrapper');
-        qWrapper.style.animation = 'none'; void qWrapper.offsetWidth;
-        qWrapper.style.animation = 'fadeIn 0.5s ease-in-out forwards';
-
-        const optionsContainer = document.getElementById('options-container');
-        optionsContainer.innerHTML = '';
-
-        const currentQuestion = quizData[currentQuestionIndex];
-        const t = uiStrings[currentLanguage];
-
-        document.getElementById('progress-indicator').style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
-        document.getElementById('progress-text').innerText = t.progressText(currentQuestionIndex + 1, quizData.length);
-        document.getElementById('question-text').innerText = currentQuestion.question[currentLanguage];
-
-        if (currentQuestion.type === 'mcq') {
-            const optionsList = document.createElement('ul');
-            optionsList.className = 'options-list';
-            currentQuestion.options[currentLanguage].forEach((option, index) => {
-                const li = document.createElement('li');
-                li.className = 'neumorphic-outset';
-                const textSpan = document.createElement('span');
-                textSpan.innerText = option;
-                li.appendChild(textSpan);
-                li.dataset.answerKey = currentQuestion.options.en[index];
-                li.addEventListener('click', selectOption);
-                optionsList.appendChild(li);
-            });
-            optionsContainer.appendChild(optionsList);
-            if (userAnswers[currentQuestionIndex]) {
-                showInstantFeedback();
-            }
+        if(!mentorInp.value.trim()) {
+            mentorInp.classList.add('input-error');
+            isValid = false;
         }
-        updateNavigation();
+
+        if(!isValid) {
+            document.getElementById('sound-error').play();
+            return;
+        }
+
+        document.getElementById('sound-click').play();
+        document.getElementById('screen-start').style.display = 'none';
+        document.getElementById('screen-quiz').style.display = 'block';
+        renderQ();
     }
 
-    function selectOption(e) {
-        const selectedLi = e.target.closest('li');
-        const optionsList = selectedLi.parentElement;
-
-        if (optionsList.classList.contains('disabled')) return;
-
-        userAnswers[currentQuestionIndex] = selectedLi.dataset.answerKey;
-
-        showInstantFeedback();
-        updateNavigation();
-
-        setTimeout(() => {
-            if (currentQuestionIndex < quizData.length - 1) {
-                handleNextButton();
-            } else {
-                showResults();
-            }
-        }, 800);
+    function renderQ() {
+        const data = quizData[current][lang];
+        document.getElementById('q-count').innerText = `Question ${current+1}/10`;
+        const p = ((current + 1) / 10) * 100;
+        document.getElementById('p-bar').style.width = p + "%";
+        document.getElementById('q-percent').innerText = p + "%";
+        let html = `<h3>${current+1}. ${data.q}</h3>`;
+        data.opts.forEach((o, i) => {
+            let cls = "opt-item " + (answers[current] !== null ? (i===quizData[current].ans?"correct":(i===answers[current]?"wrong":"locked")) : "");
+            html += `<div class="${cls}" onclick="handleSelect(${i})"><span>${o}</span></div>`;
+        });
+        document.getElementById('q-area').innerHTML = html;
+        document.getElementById('backBtn').disabled = (current === 0);
+        document.getElementById('nextBtn').disabled = (answers[current] === null);
     }
 
-    function showInstantFeedback() {
-        const optionsList = document.querySelector('.options-list');
-        if (!optionsList) return;
-        optionsList.classList.add('disabled');
-        const correctAnswerKey = quizData[currentQuestionIndex].answerKey;
+    function handleSelect(i) {
+        if(answers[current] !== null) return;
+        answers[current] = i;
+        document.getElementById(i === quizData[current].ans ? 'sound-success' : 'sound-error').play();
+        renderQ();
+    }
 
-        Array.from(optionsList.children).forEach(li => {
-            li.classList.remove('neumorphic-outset');
-            li.classList.add('selected');
-            if(li.querySelector('.feedback-icon')) li.querySelector('.feedback-icon').remove();
+    function prevQ() { current--; renderQ(); }
+    function nextQ() { if(current < 9) { current++; renderQ(); } else { showResult(); } }
 
-            const icon = document.createElement('span');
-            icon.className = 'feedback-icon';
+    function showResult() {
+        document.getElementById('screen-quiz').style.display = 'none';
+        document.getElementById('screen-result').style.display = 'block';
+        let scoreCount = answers.filter((a, i) => a === quizData[i].ans).length;
+        let percentText = (scoreCount * 10) + "%";
+        document.getElementById('final-p').innerText = percentText;
 
-            if (li.dataset.answerKey === correctAnswerKey) {
-                li.classList.add('correct');
-                icon.innerHTML = '✔';
-                li.appendChild(icon);
-            } else if (li.dataset.answerKey === userAnswers[currentQuestionIndex]) {
-                li.classList.add('incorrect');
-                icon.innerHTML = '✖';
-                li.appendChild(icon);
+        const payload = {
+            name: document.getElementById('userName').value,
+            mentor: document.getElementById('mentorName').value,
+            percent: percentText,
+            answers: answers.map((a, i) => a !== null ? quizData[i][lang].opts[a] : "Not Answered")
+        };
+
+        document.getElementById('sync-status').innerText = "🔄 SYNCING DATA...";
+        
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) 
+        })
+        .then(() => {
+            document.getElementById('sync-status').innerText = "✅ DATA SECURELY LOGGED";
+            if(scoreCount >= 8) {
+                confetti({ particleCount: 200, spread: 70 });
+                document.getElementById('sound-success').play();
             }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('sync-status').innerText = "❌ SYNC FAILED";
         });
     }
-
-    function handlePrevButton() { if(currentQuestionIndex > 0) { currentQuestionIndex--; showQuestion(); } }
-    function handleNextButton() {
-        if (currentQuestionIndex < quizData.length - 1) {
-             currentQuestionIndex++; showQuestion();
-        } else {
-             showResults();
-        }
-    }
-
-    function updateNavigation() {
-        prevBtn.disabled = currentQuestionIndex === 0;
-
-        const currentAnswer = userAnswers[currentQuestionIndex];
-        const currentQuestion = quizData[currentQuestionIndex];
-
-        if (currentQuestion.type === 'mcq') {
-            nextBtn.disabled = !currentAnswer;
-        }
-
-        nextBtn.innerText = uiStrings[currentLanguage][currentQuestionIndex === quizData.length - 1 ? 'resultsBtn' : 'nextBtn'];
-    }
-
-    function showResults() {
-        switchScreen('results');
-        let score = 0;
-        const totalMcq = quizData.filter(q => q.type === 'mcq').length;
-        userAnswers.forEach((answer, index) => {
-            if (quizData[index].type === 'mcq' && answer === quizData[index].answerKey) {
-                score++;
-            }
-        });
-        const percentage = totalMcq > 0 ? Math.round((score / totalMcq) * 100) : 0;
-
-        submitDataToSheet(score, percentage);
-
-        const t = uiStrings[currentLanguage];
-        document.getElementById('result-heading').innerText = t.getResultHeading(percentage, userName);
-        document.getElementById('score-percentage').innerText = `${percentage}%`;
-        document.getElementById('score-details').innerText = t.scoreDetails(score, totalMcq);
-
-        const circle = document.getElementById('score-progress');
-        const radius = circle.r.baseVal.value;
-        const circumference = 2 * Math.PI * radius;
-
-        circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = circumference; // Reset before animating
-
-        const offset = circumference - (percentage / 100) * circumference;
-        setTimeout(() => { circle.style.strokeDashoffset = offset; }, 100);
-
-        buildReviewScreen();
-    }
-
-    function buildReviewScreen() {
-        const reviewList = document.getElementById('review-list');
-        reviewList.innerHTML = '';
-        quizData.forEach((q, index) => {
-            const item = document.createElement('div');
-            item.className = 'review-item';
-            const questionText = document.createElement('h2');
-            questionText.innerText = (index + 1) + '. ' + q.question[currentLanguage];
-            item.appendChild(questionText);
-
-            if (q.type === 'mcq') {
-                const optionsUl = document.createElement('ul');
-                optionsUl.className = 'options-list';
-                q.options[currentLanguage].forEach((opt, optIndex) => {
-                    const li = document.createElement('li');
-                    li.className = 'neumorphic-outset';
-                    const englishOptKey = q.options.en[optIndex];
-                    li.innerText = opt;
-                    if (englishOptKey === q.answerKey) li.classList.add('correct-answer');
-                    if (englishOptKey === userAnswers[index]) {
-                        li.classList.add('user-answer');
-                        if (userAnswers[index] !== q.answerKey) li.classList.add('incorrect');
-                    }
-                    optionsUl.appendChild(li);
-                });
-                item.appendChild(optionsUl);
-            }
-            reviewList.appendChild(item);
-        });
-    }
-
-    function showNotification(message, isSuccess = false) {
-        notificationBar.innerText = message;
-        notificationBar.classList.toggle('success', isSuccess);
-        notificationBar.classList.add('show');
-        setTimeout(() => notificationBar.classList.remove('show'), 3000);
-    }
-
-    function triggerShake(element) {
-        const parentDiv = element.closest('.input-group') ? element.parentElement : element;
-        parentDiv.classList.add('invalid-field');
-        setTimeout(() => parentDiv.classList.remove('invalid-field'), 500);
-    }
-
-    function validateWelcomeScreen() {
-        const t = uiStrings[currentLanguage];
-        if (userNameInput.value.trim() === '') {
-            showNotification(t.notifyName); triggerShake(userNameInput); return false;
-        }
-
-        const mentorNameVal = mentorNameInput.value.trim();
-        const mentorNameLower = mentorNameVal.toLowerCase();
-        const validSuffixes = ['sir', 'mam', 'স্যার', 'ম্যাম'];
-        const hasValidSuffix = validSuffixes.some(suffix => mentorNameLower.endsWith(` ${suffix}`) || mentorNameLower.endsWith(suffix));
-        const namePart = mentorNameVal.replace(/sir|mam|স্যার|ম্যাম/gi, '').trim();
-        if (namePart === '' || !hasValidSuffix) {
-            showNotification(t.notifyMentor); triggerShake(mentorNameInput); return false;
-        }
-
-        if (!screenshotFile1) { showNotification(t.notifySS1); triggerShake(document.getElementById('upload-label-1')); return false; }
-        if (!screenshotFile2) { showNotification(t.notifySS2); triggerShake(document.getElementById('upload-label-2')); return false; }
-
-        if (screenshotFile1 && screenshotFile2 && screenshotFile1.name === screenshotFile2.name && screenshotFile1.size === screenshotFile2.size) {
-            showNotification(t.notifyDuplicateSS);
-            triggerShake(document.getElementById('upload-label-1'));
-            triggerShake(document.getElementById('upload-label-2'));
-            return false;
-        }
-        return true;
-    }
-
-    function handleFileUpload(e, num) {
-        const file = e.target.files[0], previewEl = document.getElementById(`ss-preview-${num}`), labelEl = document.getElementById(`upload-label-${num}`);
-        if (file && file.type.startsWith('image/')) {
-            if(num === 1) screenshotFile1 = file; else screenshotFile2 = file;
-            previewEl.src = URL.createObjectURL(file);
-            previewEl.classList.add('visible');
-            labelEl.innerText = uiStrings[currentLanguage].uploadSuccess;
-            labelEl.classList.remove('invalid-field');
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                if (num === 1) screenshotBase64_1 = event.target.result;
-                else screenshotBase64_2 = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function switchScreen(screenToShow) {
-        Object.values(screens).forEach(s => s.classList.add('hidden'));
-        screens[screenToShow].classList.remove('hidden');
-        if(screenToShow === 'review') {
-            document.getElementById('review-list').scrollTop = 0;
-        }
-    }
-    function startQuiz() { if (!validateWelcomeScreen()) return; userName = userNameInput.value.trim(); mentorName = mentorNameInput.value.trim(); switchScreen('quiz'); showQuestion(); }
-
-    function submitDataToSheet(score, percentage) {
-        const formData = new FormData();
-        formData.append('UserName', userName);
-        formData.append('MentorName', mentorName);
-        formData.append('Score', score);
-        formData.append('Percentage', percentage);
-
-        userAnswers.forEach((answer, index) => {
-            formData.append(`Q${index + 1}_Answer`, answer || 'Not Answered');
-        });
-
-        formData.append('screenshot1', screenshotBase64_1);
-        formData.append('screenshot2', screenshotBase64_2);
-
-        const submissionBtn = document.getElementById('review-btn');
-        const originalText = submissionBtn.innerText;
-        submissionBtn.disabled = true;
-        submissionBtn.style.opacity = '0.7';
-        submissionBtn.innerText = uiStrings[currentLanguage].submissionInProgress;
-
-        fetch(SCRIPT_URL, { method: 'POST', body: formData})
-            .then(response => response.json())
-            .then(data => {
-                if(data.result === 'success'){
-                    showNotification(uiStrings[currentLanguage].submissionSuccess, true);
-                } else {
-                    throw new Error(data.error || 'Unknown error');
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                showNotification(uiStrings[currentLanguage].submissionError);
-            })
-            .finally(() => {
-                submissionBtn.disabled = false;
-                submissionBtn.style.opacity = '1';
-                submissionBtn.innerText = originalText;
-            });
-    }
-
-    function restartQuiz() { window.location.reload(); }
 </script>
 </body>
 </html>
